@@ -1,42 +1,66 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""Turns census tracts shapefiles from the Spain National Statistics Institute into GeoJSON
 
-import geojson
+Conversion from shape files into GeoJSON is made according to Alexis de Varennes'
+answer in Stackoverflow
+(https://stackoverflow.com/questions/43119040/shapefile-into-geojson-conversion-python-3).
+
+Coordinate unprojection (from UTM to WSG84) uses scripts from Tom Payne (see
+https://gist.github.com/twpayne/4409500)
+"""
 from io import BytesIO
 import json
 import logging
 import os
 import requests
-import shapefile
 import shutil
 import time
 import zipfile
+
+import geojson
+import shapefile
+
 from utm_convert import unproject
 
-aut_com = ['Andalucía',
-           'Aragón',
-           'Canarias',
-           'Cantabria',
-           'Castilla y León',
-           'Castilla-La Mancha',
-           'Cataluña',
-           'Ceuta',
-           'Comunidad Foral de Navarra',
-           'Comunidad de Madrid',
-           'Comunitat Valenciana',
-           'Extremadura',
-           'Galicia',
-           'Illes Balears',
-           'La Rioja',
-           'Melilla',
-           'País Vasco',
-           'Principado de Asturias',
-           'Región de Murcia']
+__author__ = "Miguel-Angel Monjas"
+__copyright__ = "Copyright 2019"
+__credits__ = ["Miguel-Angel Monjas", "Alexis de Varennes", "Tom Payne"]
+__license__ = "Apache 2.0"
+__version__ = "0.1.1"
+__maintainer__ = "Miguel-Angel Monjas"
+__email__ = "mmonjas@gmail.com"
+__status__ = "Proof-of-Concept"
 
-iso_codes = ['ES-AN', 'ES-AR', 'ES-CN', 'ES-CB', 'ES-CL', 'ES-CM', 'ES-CT', 'ES-CE', 'ES-NC',
+
+AUT_COMMS = ['Andalucía',
+             'Aragón',
+             'Canarias',
+             'Cantabria',
+             'Castilla y León',
+             'Castilla-La Mancha',
+             'Cataluña',
+             'Ceuta',
+             'Comunidad Foral de Navarra',
+             'Comunidad de Madrid',
+             'Comunitat Valenciana',
+             'Extremadura',
+             'Galicia',
+             'Illes Balears',
+             'La Rioja',
+             'Melilla',
+             'País Vasco',
+             'Principado de Asturias',
+             'Región de Murcia']
+ISO_CODES = ['ES-AN', 'ES-AR', 'ES-CN', 'ES-CB', 'ES-CL', 'ES-CM', 'ES-CT', 'ES-CE', 'ES-NC',
              'ES-MD', 'ES-VC', 'ES-EX', 'ES-GA', 'ES-IB', 'ES-RI', 'ES-ML', 'ES-PV', 'ES-AS', 'ES-MC']
 
-hemisphere = "N"
+HEMISPHERE = "N"
+MAIN_ZONE = 30
+CANARY_ISLANDS_ZONE = 28
+
+BASE_URL = 'https://www.ine.es/prodyser/cartografia/'
+YEAR = 2019
 
 logging.basicConfig(level=logging.INFO)
 
@@ -45,31 +69,32 @@ def main():
     start = time.time()
     logging.info("Starting transformation process")
     current_folder = os.getcwd()
-    census_tracts_folder = os.path.join(current_folder, 'data', 'census')
+    parent_folder = os.path.dirname(current_folder)
+    census_tracts_folder = os.path.join(parent_folder, 'data', 'census')
     if not os.path.exists(census_tracts_folder):
         os.mkdir(census_tracts_folder)
         logging.info(f"Folder {census_tracts_folder} created")
 
-    aut_com_dict = dict(zip(aut_com, iso_codes))
+    aut_com_dict = dict(zip(AUT_COMMS, ISO_CODES))
 
-    # From https://stackoverflow.com/questions/43119040/shapefile-into-geojson-conversion-python-3
-    # (to transform shape files)
-    # From https://gist.github.com/twpayne/4409500
-    # (to handle properly the coordinates)
-    # Save the files in a folder
-    url = 'https://www.ine.es/prodyser/cartografia/seccionado_2019.zip'
+    # Save the files in a local folder
+    url = f'{BASE_URL}seccionado_{YEAR}.zip'
+    logging.info(f"Retrieving {url}")
     response = requests.get(url)
+    logging.info("File retrieved")
     with zipfile.ZipFile(BytesIO(response.content)) as zip_ref:
-        zip_folder = os.path.join(os.getcwd(), 'seccionado2019')
+        zip_folder = os.path.join(os.getcwd(), f'seccionado{YEAR}')
         zip_ref.extractall(zip_folder)
         logging.info(f"Zip archive extracted to {zip_folder}")
+
     # Read the shapefile from the folder
-    sf = shapefile.Reader(os.path.join(zip_folder, "SECC_CE_20190101.sbn"))
+    sf = shapefile.Reader(os.path.join(zip_folder, f"SECC_CE_{YEAR}0101.sbn"))
+    logging.info(f"Found {len(sf)} shapes")
     fields = sf.fields[1:]
     field_names = [field[0] for field in fields]
     buffer = []
     buffer_aut_comm = {}
-    for code in iso_codes:
+    for code in ISO_CODES:
         buffer_aut_comm[code] = []
 
     # Iterate over the shape records and transform them to the GeoJSON formal
@@ -78,9 +103,9 @@ def main():
             logging.info(f"Processed {counter + 1} shapes")
         atr = dict(zip(field_names, sr.record))
         if atr['NCA'] == "Islas Canarias":
-            zone = 28
+            zone = CANARY_ISLANDS_ZONE
         else:
-            zone = 30
+            zone = MAIN_ZONE
 
         geom = sr.shape.__geo_interface__
         converted_geom = {"type": geom['type'], "coordinates": []}
@@ -91,14 +116,14 @@ def main():
                     converted_geom['coordinates'][i].append([])
                     for k, element_k in enumerate(element_j):
                         point = list(element_k)
-                        x2, y2 = unproject(zone, hemisphere, point[0], point[1])
+                        x2, y2 = unproject(zone, HEMISPHERE, point[0], point[1])
                         converted_geom['coordinates'][i][j].append([x2, y2])
         elif geom['type'] == 'Polygon':
             for i, element_i in enumerate(geom['coordinates']):
                 converted_geom['coordinates'].append([])
                 for j, element_j in enumerate(element_i):
                     point = list(element_j)
-                    x2, y2 = unproject(zone, hemisphere, point[0], point[1])
+                    x2, y2 = unproject(zone, HEMISPHERE, point[0], point[1])
                     converted_geom['coordinates'][i].append([x2, y2])
         buffer.append(dict(type="Feature", geometry=converted_geom, properties=atr))
 
@@ -113,23 +138,24 @@ def main():
             buffer_aut_comm[aut_com_dict[atr['NCA']]].append(pol)
 
     # write the GeoJSON file
-    geojson_file = open("SECC_CE_20190101.json", "w", encoding="utf-8")
+    geojson_file_path = os.path.join(census_tracts_folder, f"SECC_CE_{YEAR}0101.json")
+    geojson_file = open(geojson_file_path, "w", encoding="utf-8")
     geojson_file.write(json.dumps({"type": "FeatureCollection", "features": buffer}) + "\n")
     geojson_file.close()
-    logging.info("File SECC_CE_20190101.json created")
+    logging.info(f"File SECC_CE_{YEAR}0101.json created")
 
-    for code in iso_codes:
-        file_path = os.path.join(census_tracts_folder, f"SECC_CE_{code}_20190101.json")
+    for code in ISO_CODES:
+        file_path = os.path.join(census_tracts_folder, f"SECC_CE_{code}_{YEAR}0101.json")
         geojson_file = open(file_path, "w", encoding="utf-8")
         geojson_file.write(json.dumps({"type": "FeatureCollection", "features": buffer_aut_comm[code]}) + "\n")
         geojson_file.close()
-        logging.info(f"File SECC_CE_{code}_20190101.json created")
+        logging.info(f"File SECC_CE_{code}_{YEAR}0101.json created")
 
     try:
         shutil.rmtree(zip_folder)
         logging.info(f"Removing {zip_folder} folder")
     except PermissionError:
-        logging.warning(f"Files not released. Cannot delete {zip_folder}")
+        logging.warning(f"Shape files not released. Cannot delete {zip_folder}")
 
     logging.info(f"Transformation process has taken {time.time() - start} seconds")
 
