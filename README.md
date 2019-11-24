@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Datasets sobre procesos electorales en España
 
 Este repo contiene datasets y código usado para construir visualizaciones sobre procesos electorales en España. Hay un foco especial también en Madrid.
@@ -6,9 +5,6 @@ Este repo contiene datasets y código usado para construir visualizaciones sobre
 ## Secciones censales
 
 El principal dataset proporcionado es el de secciones censales (2019), en formato GeoJSON, extraído a partir de la web del [INE](https://www.ine.es/ss/Satellite?L=es_ES&c=Page&cid=1259952026632&p=1259952026632&pagename=ProductosYServicios%2FPYSLayout) y fragmentado por comunidad autónoma. Los ficheros se encontraban originalmente en formato shape y coordenadas con proyección UTM en huso 30 (28 para Canarias). A partir de código disponible en diversas fuentes ([respuesta de Alexis de Varennes en Stackoverflow sobre la conversión de shapefiles en ficheros GeoJSON](https://stackoverflow.com/questions/43119040/shapefile-into-geojson-conversion-python-3) y [un script de Tom Payne para hacer conversiones entre proyecciones UTM y WSG84](https://gist.github.com/twpayne/4409500)), se ha conseguido hacer la conversión a GeoJSON con coordenadas WSG84, de forma que los ficheros pueden cargarse en CartoDB, Flourish o Google Maps.
-=======
-# Miscellaneous repo for visualizations based on census sections in Spain
->>>>>>> parent of a14b2fd... Starting
 
 Los ficheros con las secciones censales se encuentran en la carpeta `data/census` (por comunidad autónoma, con los [códigos ISO_3166-2](https://en.wikipedia.org/wiki/ISO_3166-2:ES) para identificar la comunidad autónoma).
 
