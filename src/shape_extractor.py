@@ -13,6 +13,7 @@ from io import BytesIO
 import json
 import logging
 import os
+import pandas as pd
 import requests
 import shutil
 import time
@@ -27,33 +28,11 @@ __author__ = "Miguel-Angel Monjas"
 __copyright__ = "Copyright 2019"
 __credits__ = ["Miguel-Angel Monjas", "Alexis de Varennes", "Tom Payne"]
 __license__ = "Apache 2.0"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __maintainer__ = "Miguel-Angel Monjas"
 __email__ = "mmonjas@gmail.com"
 __status__ = "Proof-of-Concept"
 
-
-AUT_COMMS = ['Andalucía',
-             'Aragón',
-             'Canarias',
-             'Cantabria',
-             'Castilla y León',
-             'Castilla-La Mancha',
-             'Cataluña',
-             'Ceuta',
-             'Comunidad Foral de Navarra',
-             'Comunidad de Madrid',
-             'Comunitat Valenciana',
-             'Extremadura',
-             'Galicia',
-             'Illes Balears',
-             'La Rioja',
-             'Melilla',
-             'País Vasco',
-             'Principado de Asturias',
-             'Región de Murcia']
-ISO_CODES = ['ES-AN', 'ES-AR', 'ES-CN', 'ES-CB', 'ES-CL', 'ES-CM', 'ES-CT', 'ES-CE', 'ES-NC',
-             'ES-MD', 'ES-VC', 'ES-EX', 'ES-GA', 'ES-IB', 'ES-RI', 'ES-ML', 'ES-PV', 'ES-AS', 'ES-MC']
 
 HEMISPHERE = "N"
 MAIN_ZONE = 30
@@ -64,18 +43,28 @@ YEAR = 2019
 
 logging.basicConfig(level=logging.INFO)
 
-
 def main():
     start = time.time()
     logging.info("Starting transformation process")
     current_folder = os.getcwd()
     parent_folder = os.path.dirname(current_folder)
+
+    # ISO codes extraction
+    data_folder = os.path.join(parent_folder, 'data')
+    iso_codes_file_path = os.path.join(data_folder, 'ISO 3166-2.csv')
+    
+    iso_codes_df = pd.read_csv(iso_codes_file_path, sep='\t')
+    iso_codes_aut_com_df = iso_codes_df[(iso_codes_df['categoría de subdivisión'] == 'comunidad autónoma') | (iso_codes_df['categoría de subdivisión'] == 'ciudad autónoma')]
+    iso_codes = list(iso_codes_aut_com_df['código 3166-2'].unique())
+    autonomous_communities = list(iso_codes_aut_com_df['nombre de la subdivisión'].unique())
+
+    # census tracts extraction
     census_tracts_folder = os.path.join(parent_folder, 'data', 'census')
     if not os.path.exists(census_tracts_folder):
         os.mkdir(census_tracts_folder)
         logging.info(f"Folder {census_tracts_folder} created")
 
-    aut_com_dict = dict(zip(AUT_COMMS, ISO_CODES))
+    aut_com_dict = dict(zip(autonomous_communities, iso_codes))
 
     # Save the files in a local folder
     url = f'{BASE_URL}seccionado_{YEAR}.zip'
@@ -94,7 +83,7 @@ def main():
     field_names = [field[0] for field in fields]
     buffer = []
     buffer_aut_comm = {}
-    for code in ISO_CODES:
+    for code in iso_codes:
         buffer_aut_comm[code] = []
 
     # Iterate over the shape records and transform them to the GeoJSON formal
@@ -144,7 +133,7 @@ def main():
     geojson_file.close()
     logging.info(f"File SECC_CE_{YEAR}0101.json created")
 
-    for code in ISO_CODES:
+    for code in iso_codes:
         file_path = os.path.join(census_tracts_folder, f"SECC_CE_{code}_{YEAR}0101.json")
         geojson_file = open(file_path, "w", encoding="utf-8")
         geojson_file.write(json.dumps({"type": "FeatureCollection", "features": buffer_aut_comm[code]}) + "\n")

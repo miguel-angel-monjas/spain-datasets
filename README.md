@@ -1,6 +1,13 @@
-# Datasets sobre procesos electorales en España
+# Datasets y herramientas para analizar procesos electorales en españa
 
-Este repo contiene datasets y código usado para construir visualizaciones sobre procesos electorales en España. Hay un foco especial también en Madrid.
+Este repo contiene datasets y código usado para construir visualizaciones sobre procesos electorales en España. Se proporcionan los siguientes datasets y herramientas asociadas:
+- Secciones censales, en formato GeoJSON.
+- Renta media, en formato CSV.
+- Códigos ISO 3166-2 de comunidades autónomas, provincias y ciudades autónomas, en formato CSV.
+
+Hay un foco especial también en Madrid, por lo que se proporcionan:
+- Resultados provisionales de las elecciones generales (Congreso) de noviembre de 2019, en formato CSV.
+- Renta media por sección censal.
 
 ## Secciones censales
 
@@ -46,5 +53,8 @@ La renta media por sección censal se encuentra en `data/Renta media en España.
 - Tipo de elemento: municipio, distrito o sección (censal)
 - Renta media por persona
 - Renta media por hogar
+
+## Códigos ISO 3166-2
+Los códigos ISO 3166-2 se encuentran en `data/ISO 3166-2.csv`. Han sido extraídos del sitio web de la [ISO](https://www.iso.org/obp/ui/#iso:code:3166:ES).
 
 ## Resultados electorales

@@ -1,0 +1,70 @@
+﻿categoría de subdivisión	código 3166-2	nombre de la subdivisión	subdivisión padre
+provincia	ES-A	Alicante/Alacant	ES-VC
+provincia	ES-AB	Albacete	ES-CM
+provincia	ES-AL	Almería	ES-AN
+comunidad autónoma	ES-AN	Andalucía
+comunidad autónoma	ES-AR	Aragón
+comunidad autónoma	ES-AS	Principado de Asturias
+provincia	ES-AV	Ávila	ES-CL
+provincia	ES-B	Barcelona	ES-CT
+provincia	ES-BA	Badajoz	ES-EX
+provincia	ES-BI	Bizkaia	ES-PV
+provincia	ES-BU	Burgos	ES-CL
+provincia	ES-C	A Coruña	ES-GA
+provincia	ES-CA	Cádiz	ES-AN
+comunidad autónoma	ES-CB	Cantabria
+provincia	ES-CC	Cáceres	ES-EX
+ciudad autónoma	ES-CE	Ceuta
+comunidad autónoma	ES-CL	Castilla y León
+comunidad autónoma	ES-CM	Castilla-La Mancha
+comunidad autónoma	ES-CN	Canarias
+provincia	ES-CO	Córdoba	ES-AN
+provincia	ES-CR	Ciudad Real	ES-CM
+provincia	ES-CS	Castellón/Castelló	ES-VC
+comunidad autónoma	ES-CT	Cataluña
+provincia	ES-CU	Cuenca	ES-CM
+comunidad autónoma	ES-EX	Extremadura
+comunidad autónoma	ES-GA	Galicia
+provincia	ES-GC	Las Palmas	ES-CN
+provincia	ES-GI	Girona	ES-CT
+provincia	ES-GR	Granada	ES-AN
+provincia	ES-GU	Guadalajara	ES-CM
+provincia	ES-H	Huelva	ES-AN
+provincia	ES-HU	Huesca	ES-AR
+comunidad autónoma	ES-IB	Illes Balears
+provincia	ES-J	Jaén	ES-AN
+provincia	ES-L	Lleida	ES-CT
+provincia	ES-LE	León	ES-CL
+provincia	ES-LO	La Rioja	ES-RI
+provincia	ES-LU	Lugo	ES-GA
+provincia	ES-M	Madrid	ES-MD
+provincia	ES-MA	Málaga	ES-AN
+comunidad autónoma	ES-MC	Región de Murcia
+comunidad autónoma	ES-MD	Comunidad de Madrid
+ciudad autónoma	ES-ML	Melilla
+provincia	ES-MU	Murcia	ES-MC
+provincia	ES-NA	Navarra	ES-NC
+comunidad autónoma	ES-NC	Comunidad Foral de Navarra
+provincia	ES-O	Asturias	ES-AS
+provincia	ES-OR	Ourense	ES-GA
+provincia	ES-P	Palencia	ES-CL
+provincia	ES-PM	Illes Balears	ES-IB
+provincia	ES-PO	Pontevedra	ES-GA
+comunidad autónoma	ES-PV	País Vasco
+comunidad autónoma	ES-RI	La Rioja
+provincia	ES-S	Cantabria	ES-CB
+provincia	ES-SA	Salamanca	ES-CL
+provincia	ES-SE	Sevilla	ES-AN
+provincia	ES-SG	Segovia	ES-CL
+provincia	ES-SO	Soria	ES-CL
+provincia	ES-SS	Gipuzkoa	ES-PV
+provincia	ES-T	Tarragona	ES-CT
+provincia	ES-TE	Teruel	ES-AR
+provincia	ES-TF	Santa Cruz de Tenerife	ES-CN
+provincia	ES-TO	Toledo	ES-CM
+provincia	ES-V	Valencia/València	ES-VC
+provincia	ES-VA	Valladolid	ES-CL
+comunidad autónoma	ES-VC	Comunitat Valenciana
+provincia	ES-VI	Araba/Álava	ES-PV
+provincia	ES-Z	Zaragoza	ES-AR
+provincia	ES-ZA	Zamora	ES-CL
